@@ -5,11 +5,13 @@ const userRoutes = require('./routes/userRoutes');
 const jobRoutes = require('./routes/JobRoutes');
 const Job = require('./Models/JobsModel'); // Job model
 const Scheduler = require('./services/scheduleTriggerServices'); // Scheduler service
+const { connectRedis } = require('./cache/redisClient'); // Import the Redis client setup
 
 const app = express();
 
 // Connect to Database
 connectToDB();
+connectRedis();
 
 app.use(bodyParser.json());
 

@@ -5,7 +5,8 @@ const JobScheduleSchema = new mongoose.Schema({
   schedule_type: { type: String, required: true },
   start_time: { type: Date },
   interval: { type: String },
-  end_time: { type: Date }
+  end_time: { type: Date },
+  occurence: {type: Number}
 });
 
 module.exports = mongoose.model('JobSchedule', JobScheduleSchema);
