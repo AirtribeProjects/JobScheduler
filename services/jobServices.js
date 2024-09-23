@@ -12,56 +12,147 @@ const { findJobById,
         const { type, parameters, schedule } = jobInfo;
     
         try {
-            const job = new Job({
-                type,
-                status: 'pending',
-                created_at: Date.now(),
-                updated_at: Date.now(),
-                created_by: userId
-            });
-            await job.save();
+            const jobInstances = []; // To hold all created job instances
     
-            // Save job parameters
-            const parameterIds = [];
-            if (parameters) {
-                for (const [key, value] of Object.entries(parameters)) {
-                    const param = new JobParameter({
-                        job_id: job._id,
-                        param_key: key,
-                        param_value: value
+            // If the job is one-time, create a single instance
+            if (schedule.type === 'one-time') {
+                const job = new Job({
+                    type,
+                    status: 'pending',
+                    created_at: Date.now(),
+                    updated_at: Date.now(),
+                    created_by: userId,
+                    lastRun: null // No last run yet
+                });
+    
+                await job.save();
+    
+                // Save job parameters
+                const parameterIds = [];
+                if (parameters) {
+                    for (const [key, value] of Object.entries(parameters)) {
+                        const param = new JobParameter({
+                            job_id: job._id,
+                            param_key: key,
+                            param_value: value
+                        });
+                        await param.save();
+                        parameterIds.push(param._id); // Store the parameter ID
+                    }
+                }
+    
+                // Save scheduling information for the one-time job
+                const jobSchedule = new JobSchedule({
+                    job_id: job._id,
+                    schedule_type: 'one-time',
+                    start_time: new Date(schedule.startTime),
+                    interval: null, // No recurrence interval for one-time jobs
+                    end_time: null, // No end time for one-time jobs
+                });
+                await jobSchedule.save();
+    
+                // Update job with parameter and schedule references
+                job.parameters = parameterIds; // Assign parameters to the job
+                job.schedule = jobSchedule._id; // Assign schedule to the job
+                await job.save(); // Save the updated job
+    
+                jobInstances.push(job); // Keep track of the created job instance
+            } else {
+                // For recurring jobs, calculate occurrences and create multiple instances
+                const occurrences = schedule.recurrence?.occurence || 1; // Default to 1 if not specified
+                const startTime = new Date(schedule.startTime);
+    
+                for (let i = 0; i < occurrences; i++) {
+                    const job = new Job({
+                        type,
+                        status: 'pending',
+                        created_at: Date.now(),
+                        updated_at: Date.now(),
+                        created_by: userId,
+                        lastRun: null // No last run yet
                     });
-                    await param.save();
-                    parameterIds.push(param._id); // Store the parameter ID
+    
+                    await job.save();
+    
+                    // Save job parameters
+                    const parameterIds = [];
+                    if (parameters) {
+                        for (const [key, value] of Object.entries(parameters)) {
+                            const param = new JobParameter({
+                                job_id: job._id,
+                                param_key: key,
+                                param_value: value
+                            });
+                            await param.save();
+                            parameterIds.push(param._id); // Store the parameter ID
+                        }
+                    }
+    
+                    // Save scheduling information
+                    let instanceStartTime;
+    
+                    // Determine the start time for each instance
+                    switch (schedule.recurrence.interval) {
+                        case 'hourly':
+                            instanceStartTime = new Date(startTime.getTime() + i * 60 * 60 * 1000); // Add hours
+                            break;
+                        case 'daily':
+                            instanceStartTime = new Date(startTime.getTime() + i * 24 * 60 * 60 * 1000); // Add days
+                            break;
+                        case 'weekly':
+                            instanceStartTime = new Date(startTime.getTime() + i * 7 * 24 * 60 * 60 * 1000); // Add weeks
+                            break;
+                        case 'monthly':
+                            instanceStartTime = new Date(startTime);
+                            instanceStartTime.setMonth(startTime.getMonth() + i); // Add months
+                            break;
+                        default:
+                            instanceStartTime = new Date(startTime.getTime() + i * calculateInterval(schedule.recurrence.interval));
+                    }
+    
+                    const jobSchedule = new JobSchedule({
+                        job_id: job._id,
+                        schedule_type: schedule.type,
+                        start_time: instanceStartTime,
+                        interval: schedule.recurrence.interval,
+                        end_time: schedule.recurrence.endTime ? new Date(schedule.recurrence.endTime) : null,
+                    });
+                    await jobSchedule.save();
+    
+                    // Update job with parameter and schedule references
+                    job.parameters = parameterIds; // Assign parameters to the job
+                    job.schedule = jobSchedule._id; // Assign schedule to the job
+                    await job.save(); // Save the updated job
+    
+                    jobInstances.push(job); // Keep track of all created job instances
                 }
             }
     
-            // Save scheduling information
-            let jobScheduleId;
-            if (schedule) {
-                const jobSchedule = new JobSchedule({
-                    job_id: job._id,
-                    schedule_type: schedule.type,
-                    start_time: new Date(schedule.startTime),
-                    interval: schedule.recurrence ? schedule.recurrence.interval : null,
-                    end_time: schedule.recurrence ? new Date(schedule.recurrence.endTime) : null,
-                });
-                await jobSchedule.save();
-                jobScheduleId = jobSchedule._id; // Get the schedule ID
-            }
-    
-            // Update job with parameter and schedule references
-            job.parameters = parameterIds; // Assign parameters to the job
-            job.schedule = jobScheduleId; // Assign schedule to the job
-            await job.save(); // Save the updated job
-    
-            return job._id; // Return the job ID
+            return jobInstances.map(job => job._id); // Return the IDs of all created jobs
         } catch (error) {
             console.error('Error creating job:', error);
             throw new Error('Failed to create job'); // Rethrow or handle the error as needed
         }
     };
     
-
+    
+    
+    // Helper function to calculate the interval in milliseconds
+    function calculateInterval(interval) {
+        switch (interval) {
+            case 'hourly':
+                return 60 * 60 * 1000; // 1 hour in milliseconds
+            case 'daily':
+                return 24 * 60 * 60 * 1000; // 1 day in milliseconds
+            case 'weekly':
+                return 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
+            case 'monthly':
+                return 30 * 24 * 60 * 60 * 1000; // Approx. 1 month in milliseconds
+            default:
+                return 0; // No interval
+        }
+    }
+    
 // Get job details
 const getJobDetails = async (jobId, userId, userRole) => {
     try {

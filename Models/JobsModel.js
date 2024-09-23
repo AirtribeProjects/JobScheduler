@@ -23,7 +23,8 @@ const JobSchema = new mongoose.Schema({
   parameters: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'JobParameter'
-  }]
+  }],
+  successEmailSent: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model('Job', JobSchema);

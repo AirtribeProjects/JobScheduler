@@ -10,7 +10,7 @@ const jobValidate = [
   check('parameters.body', 'Email body is required').not().isEmpty(),
   check('schedule.type', 'Schedule type is required').isIn(['one-time', 'recurring']),
   check('schedule.startTime', 'Start time is required').not().isEmpty(),
-  check('schedule.recurrence.interval', 'Interval is required for recurring jobs').optional().isIn(['hourly', 'daily', 'weekly']),
+  check('schedule.recurrence.interval', 'Interval is required for recurring jobs').optional().isIn(['hourly', 'daily', 'weekly','monthly']),
 ];
 
 // Find job by ID
