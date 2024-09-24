@@ -2,6 +2,8 @@ const User = require("../Models/userModel");
 const userUtils = require("../Utils/userUtils")
 const jwt = require("jsonwebtoken");
 const { registerUser,loginUser} = require('../services/userServices');
+const redisClient = require('../cache/redisClient').client;
+
 require('dotenv').config();
 
 // Controller functions for user related actions
@@ -48,9 +50,13 @@ const userController = {
                 if(!isPassowrdValid) {
                     res.status(401).json({message: 'Incorrect Password'});
                 }
-               const payload = {userId: user.id,role:user.role};
-                // Generate JWT token
-                const token = jwt.sign(payload, process.env.SECRET_KEY);
+
+                const payload = { userId: user.id, role: user.role };
+                const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' });
+      
+                // Save the token in Redis with a TTL of 1 hour
+                await redisClient.set(`userToken:${user.id}`, token, 'EX', 3600);
+      
                 res.status(200).json({ userId: user.id, token });
             } else {
                 let message = userValidator.validateLoginDetails(req.body).message;
@@ -71,7 +77,28 @@ const userController = {
           console.error(err.message);
           res.status(500).send('Server error');
         }
-      }
+      },
+
+      /**
+    * Logs out the user by removing the JWT token from Redis
+    */
+    logoutUser: async (req, res) => {
+        try {
+            // Extract the JWT token from the Authorization header
+            const token = req.header('Authorization').replace('Bearer ', '');
+
+            // Verify the token and extract user ID
+            const userDetails = jwt.verify(token, process.env.SECRET_KEY);
+
+            // Remove the token from Redis using the userId
+            await redisClient.del(`userToken:${userDetails.userId}`);
+
+            res.status(200).json({ message: 'Logout successful' });
+        } catch (error) {
+            console.error('Error during logout:', error);
+            res.status(500).json({ message: 'Error occurred during logout' });
+        }
+    }
 }
 
 module.exports = userController;

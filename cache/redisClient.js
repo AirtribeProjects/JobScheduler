@@ -8,11 +8,13 @@ client.on('error', (err) => {
 
 const connectRedis = async () => {
     try {
-        await client.connect();
+        await client.connect(); // Redis v4.x uses connect as an async function
         console.log('Connected to Redis');
     } catch (err) {
         console.error('Could not connect to Redis', err);
     }
 };
+
+
 
 module.exports = { client, connectRedis };

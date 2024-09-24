@@ -108,21 +108,21 @@ class Scheduler {
 
             // Update job status to completed
             job.status = 'completed';
-            job.retryCount = 0; // Reset retry count on success
+            job.retry_count = 0; // Reset retry count on success
             job.lastRun = new Date();
             await job.save(); // Save the updated job status
         } catch (error) {
             console.error(`Error executing job ${job.id}:`, error);
 
             // Increment the retry count
-            job.retryCount += 1;
+            job.retry_count += 1;
 
             // Log failure
             await this.logJobResult(job, 'failure', error.message);
 
             // Retry the job if it hasn't reached max retries
-            if (job.retryCount <= job.maxRetries) {
-                console.log(`Retrying job ${job.id} (${job.retryCount}/${job.maxRetries})...`);
+            if (job.retry_count <= job.max_retries) {
+                console.log(`Retrying job ${job.id} (${job.retry_count}/${job.max_retries})...`);
                 await this.scheduleRetry(job); // Schedule the retry
             } else {
                 job.status = 'failed'; // Mark job as failed after max retries
