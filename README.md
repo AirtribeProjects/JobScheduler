@@ -118,7 +118,7 @@ node index.js
 
 Submit a one-time or recurring job.
 
-- **Endpoint:** `POST /api/jobs`
+- **Endpoint:** `POST /jobs`
 - **Header** : Authization : <user bearer token>
 - **Request Body:**
 ```json
@@ -152,7 +152,7 @@ Submit a one-time or recurring job.
 ### 2. Get Job Details
 
 Retrieves details about a specific job.[only admins and creator will be able to view the job details]
-- **Endpoint:** `GET /api/jobs/:jobId`
+- **Endpoint:** `GET /jobs/:jobId`
 - **Header** : Authization : <user bearer token>
 
 - **Response:**
@@ -186,7 +186,7 @@ Retrieves details about a specific job.[only admins and creator will be able to 
 
 Updates details of an existing job (e.g., rescheduling, changing parameters).
 
-- **Endpoint:** `PUT /api/jobs/:jobId`
+- **Endpoint:** `PUT /jobs/:jobId`
 - **Header** : Authization : <user bearer token>
 
 - **Request Body:**
@@ -220,7 +220,7 @@ Updates details of an existing job (e.g., rescheduling, changing parameters).
 ### 4. Cancel Job
 Deletes the specific job.
 
-- **Endpoint:** ` DELETE /api/jobs/:jobId`
+- **Endpoint:** ` DELETE /jobs/:jobId`
 - **Header** : Authization : <user bearer token>
 
 - **Response:**
@@ -234,7 +234,7 @@ Deletes the specific job.
 ### 5. Get All Jobs
 Retrieves a list of all jobs with optional filtering based on status or user.
 
-- **Endpoint:** `GET /api/jobs`
+- **Endpoint:** `GET /jobs`
 - **Header** : Authization : <user bearer token>
 
 - **Request parameter:**
@@ -263,7 +263,7 @@ Retrieves a list of all jobs with optional filtering based on status or user.
 ### 6. Get Job Logs
 Retrieves logs for a specific job.
 
-- **Endpoint:** `GET /api/jobs/:jobId/logs`
+- **Endpoint:** `GET /jobs/:jobId/logs`
 - **Header** : Authization : <user bearer token>
 
 - **Response:**
@@ -280,7 +280,7 @@ Retrieves logs for a specific job.
 
 ### Authentication
 Register
-URL: /register
+URL: users/register
 Method: POST
 Request Body:
 ```json
@@ -292,7 +292,7 @@ Request Body:
 ```
 
 login
-URL: /login
+URL: users/login
 Method: POST
 Request Body:
 ```json
@@ -305,7 +305,7 @@ Request Body:
 User Logout
 Logs out a user by invalidating their session.
 
-Endpoint: POST /api/auth/logout
+Endpoint: POST users/logout
 - **Header** : Authization : <user bearer token>
 
 ```json
@@ -313,6 +313,8 @@ Endpoint: POST /api/auth/logout
   "message": "Logout successful"
 }
 ```
+
+
 ## Error Handling
 
 - Proper error handling is implemented for invalid requests.
