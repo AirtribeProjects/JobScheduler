@@ -1,6 +1,6 @@
 const { validationResult } = require('express-validator');
 const { createJob,getJobDetails, updateJob,cancelJob,getAllJobs } = require("../services/jobServices");
-
+const Logs = require('../Models/LoggerModel')
 
 const jobController = {
 
@@ -105,6 +105,28 @@ const jobController = {
         } catch (error) {
           console.error('Error fetching jobs:', error.message);
           return res.status(500).json({ message: 'Internal server error' });
+        }
+    },
+
+    /**
+     * Get logs for a specific job
+     */
+    getJobLogs: async (req, res) => {
+        try {
+            const { jobId } = req.params;  // Get jobId from request params
+
+            // Fetch logs for the specified jobId
+            const logs = await Logs.find({ job_id: jobId });
+
+            if (!logs || logs.length === 0) {
+                return res.status(404).json({ message: 'No logs found for this job' });
+            }
+
+            // Return the logs in the response
+            res.status(200).json(logs);
+        } catch (error) {
+            console.error('Error fetching logs:', error);
+            res.status(500).json({ message: 'Error fetching logs' });
         }
     }
 }

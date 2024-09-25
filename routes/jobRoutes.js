@@ -16,6 +16,9 @@ router.delete('/:jobId', authJWT, jobController.cancelJob);
 //get all jobs
 router.get('/', authJWT, jobController.getAllJobs);
 
+//get log for specific job
+router.get('/:jobId/logs', jobController.getJobLogs);
+
 
 
 module.exports = router;

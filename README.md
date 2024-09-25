@@ -1,6 +1,6 @@
 # JobScheduler
 
-This project is a distributed job scheduling and management system built with Express.js, MongoDB, Redis, BullMQ, and Node-Cron. It provides functionality to handle one-time and recurring jobs with job submission, monitoring, retries, and logging capabilities. 
+This project is a distributed job scheduling and management system built with Express.js, MongoDB, Redis. It provides functionality to handle one-time and recurring jobs with job submission, monitoring, retries, and logging capabilities. 
 
 ## Key Features
 
@@ -314,6 +314,11 @@ Endpoint: POST users/logout
 }
 ```
 
+## Logging
+- All job execution results (success or failure) are logged in MongoDB for auditing purposes. The logs include job details, status, error messages, and timestamps.
+
+## Notifications
+- The system sends email notifications to users when their job fails after all retry attempts, ensuring transparency and immediate feedback on job statuses.
 
 ## Error Handling
 
