@@ -122,7 +122,7 @@ Submit a one-time or recurring job.
 - **Request Body:**
 ```json
 
-  `{
+  {
   "type": "string",  // Type of job (e.g., "email", "data processing")
   "parameters": {    // Job-specific parameters
     "to": "string",
@@ -136,7 +136,151 @@ Submit a one-time or recurring job.
       "interval": "string", // e.g., "hourly", "daily", "weekly"
       "endTime": "ISODate"  // Optional end date for recurrence
     }
-  }`
+  }
+  }
 ```
+- **Response:**
+
+```json
+{
+  "jobId": "string", // Unique identifier for the job
+  "message": "Job created successfully"
 }
+```
+
+### 2. Get Job Details
+
+Retrieves details about a specific job.[only admins and creator will be able to view the job details]
+- **Endpoint:** `GET /api/jobs/:jobId`
+
+- **Response:**
+
+```json
+{
+  "jobId": "string",
+  "type": "string",
+  "status": "string",
+  "retryCount": "number",
+  "maxRetries": "number",
+  "createdAt": "ISODate",
+  "updatedAt": "ISODate",
+  "parameters": {
+    "to": "string",
+    "subject": "string",
+    "body": "string"
+  },
+  "schedule": {
+    "type": "string",
+    "startTime": "ISODate",
+    "recurrence": {
+      "interval": "string",
+      "endTime": "ISODate"
+    }
+  }
+}
+```
+
+### 3.Update Job
+
+Updates details of an existing job (e.g., rescheduling, changing parameters).
+
+- **Endpoint:** `GET /api/jobs/:jobId`
+
+- **Request Body:**
+Endpoint: PUT /api/jobs/:jobId
+
+Request Body:
+json
+Copy code
+{
+  "type": "string",           // Type of job (if changed)
+  "parameters": {             // Updated job-specific parameters
+    "to": "string",
+    "subject": "string",
+    "body": "string"
+  },
+  "schedule": {               // Updated scheduling information
+    "type": "string",         // "one-time" or "recurring"
+    "startTime": "ISODate",   // For one-time jobs
+    "recurrence": {           // For recurring jobs
+      "interval": "string",   // e.g., "hourly", "daily", "weekly"
+      "endTime": "ISODate"    // Optional end date for recurrence
+    }
+  }
+}
+Response:
+json
+Copy code
+{
+  "message": "Job updated successfully"
+}
+4. Cancel Job
+Deletes the specific job.
+
+- **Endpoint:** `GET /api/jobs/:jobId`
+
+- **Request Body:**
+
+Endpoint: DELETE /api/jobs/:jobId
+Response:
+json
+Copy code
+{
+  "message": "Job cancelled successfully"
+}
+
+### 5. Get All Jobs
+Retrieves a list of all jobs with optional filtering based on status or user.
+
+- **Endpoint:** `GET /api/jobs`
+
+- **Request parameter:**
+
+```json
+{
+  "status": "string",  // Optional filter by job status
+  "userId": "string"   // Optional filter by user
+}
+```
+- **Response:**
+
+```json
+[
+  {
+    "jobId": "string",
+    "type": "string",
+    "status": "string",
+    "retryCount": "number",
+    "maxRetries": "number",
+    "createdAt": "ISODate",
+    "updatedAt": "ISODate"
+  }
+]
+```
+### 6. Get Job Logs
+Retrieves logs for a specific job.
+
+- **Endpoint:** `GET /api/jobs/:jobId/logs`
+- **Response:**
+```json
+[
+  {
+    "logId": "string",
+    "timestamp": "ISODate",
+    "status": "string",
+    "message": "string"
+  }
+]
+```
+
+## Error Handling
+
+- Proper error handling is implemented for invalid requests.
+- Input validation is performed for task creation and updates.
+
+
+
+
+
+
 
