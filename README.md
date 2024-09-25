@@ -97,6 +97,13 @@ npm init
 
 npm install express mongoose bcryptjs jsonwebtoken dotenv redis nodemailer express-validator
 
+4. Environment Setup: Create a .env file in the root directory with the following variables:
+SECRET_KEY = <your key>
+MONGO_DB_URI= <your mongdb url>
+SENDER_EMAIL_ID = <sender email id>
+SENDER_APP_PASSWORD = <app password>
+
+
 ## Usage
 
 1. Start the server:
@@ -114,8 +121,20 @@ Submit a one-time or recurring job.
 - **Endpoint:** `POST /api/jobs`
 - **Request Body:**
 
-  ```json
-  {
-    "type": "string",  // e.g., "email", "data processing"
-    "parameters": {    
-      "to": "
+  `{
+  "type": "string",  // Type of job (e.g., "email", "data processing")
+  "parameters": {    // Job-specific parameters
+    "to": "string",
+    "subject": "string",
+    "body": "string"
+  },
+  "schedule": {      // Scheduling information
+    "type": "string", // "one-time" or "recurring"
+    "startTime": "ISODate", // For one-time jobs
+    "recurrence": {  // For recurring jobs
+      "interval": "string", // e.g., "hourly", "daily", "weekly"
+      "endTime": "ISODate"  // Optional end date for recurrence
+    }
+  }`
+}
+
