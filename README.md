@@ -119,6 +119,7 @@ node index.js
 Submit a one-time or recurring job.
 
 - **Endpoint:** `POST /api/jobs`
+- **Header** : Authization : <user bearer token>
 - **Request Body:**
 ```json
 
@@ -152,6 +153,7 @@ Submit a one-time or recurring job.
 
 Retrieves details about a specific job.[only admins and creator will be able to view the job details]
 - **Endpoint:** `GET /api/jobs/:jobId`
+- **Header** : Authization : <user bearer token>
 
 - **Response:**
 
@@ -184,14 +186,12 @@ Retrieves details about a specific job.[only admins and creator will be able to 
 
 Updates details of an existing job (e.g., rescheduling, changing parameters).
 
-- **Endpoint:** `GET /api/jobs/:jobId`
+- **Endpoint:** `PUT /api/jobs/:jobId`
+- **Header** : Authization : <user bearer token>
 
 - **Request Body:**
-Endpoint: PUT /api/jobs/:jobId
 
-Request Body:
-json
-Copy code
+```json
 {
   "type": "string",           // Type of job (if changed)
   "parameters": {             // Updated job-specific parameters
@@ -208,31 +208,34 @@ Copy code
     }
   }
 }
-Response:
-json
-Copy code
+```
+-**Response:**
+```json
+
 {
   "message": "Job updated successfully"
 }
-4. Cancel Job
+```
+
+### 4. Cancel Job
 Deletes the specific job.
 
-- **Endpoint:** `GET /api/jobs/:jobId`
+- **Endpoint:** ` DELETE /api/jobs/:jobId`
+- **Header** : Authization : <user bearer token>
 
-- **Request Body:**
+- **Response:**
 
-Endpoint: DELETE /api/jobs/:jobId
-Response:
-json
-Copy code
+```json
 {
   "message": "Job cancelled successfully"
 }
+```
 
 ### 5. Get All Jobs
 Retrieves a list of all jobs with optional filtering based on status or user.
 
 - **Endpoint:** `GET /api/jobs`
+- **Header** : Authization : <user bearer token>
 
 - **Request parameter:**
 
@@ -261,6 +264,8 @@ Retrieves a list of all jobs with optional filtering based on status or user.
 Retrieves logs for a specific job.
 
 - **Endpoint:** `GET /api/jobs/:jobId/logs`
+- **Header** : Authization : <user bearer token>
+
 - **Response:**
 ```json
 [
@@ -273,6 +278,41 @@ Retrieves logs for a specific job.
 ]
 ```
 
+### Authentication
+Register
+URL: /register
+Method: POST
+Request Body:
+```json
+{
+  "userName": "yourname",
+  "emailId": "yourname@example.com",
+  "password": "yourpassword"
+}
+```
+
+login
+URL: /login
+Method: POST
+Request Body:
+```json
+
+{
+  "usename": "name",
+  "password": "yourpassword"
+}
+```
+User Logout
+Logs out a user by invalidating their session.
+
+Endpoint: POST /api/auth/logout
+- **Header** : Authization : <user bearer token>
+
+```json
+{
+  "message": "Logout successful"
+}
+```
 ## Error Handling
 
 - Proper error handling is implemented for invalid requests.
