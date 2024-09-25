@@ -120,6 +120,7 @@ Submit a one-time or recurring job.
 
 - **Endpoint:** `POST /api/jobs`
 - **Request Body:**
+```json
 
   `{
   "type": "string",  // Type of job (e.g., "email", "data processing")
@@ -136,5 +137,6 @@ Submit a one-time or recurring job.
       "endTime": "ISODate"  // Optional end date for recurrence
     }
   }`
+```
 }
 
