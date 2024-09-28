@@ -1,6 +1,6 @@
-const { validationResult } = require('express-validator'); // Import validationResult from express-validator for request validation
-const { createJob, getJobDetails, updateJob, cancelJob, getAllJobs } = require("../services/jobServices"); // Import job-related services
-const Logs = require('../Models/LoggerModel'); // Import LoggerModel to fetch logs
+const { validationResult } = require('express-validator');
+const { createJob, getJobDetails, updateJob, cancelJob, getAllJobs } = require("../services/jobServices");
+const Logs = require('../Models/LoggerModel');
 
 const jobController = {
 
